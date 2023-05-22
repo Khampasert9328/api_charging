@@ -19,6 +19,7 @@ exports.register = async (req, res, next) => {
             users.password = await users.encryptPassword(password)
         await users.save()
         res.status(201).json({
+            status_code:201,
             message: 'ລົງທະບຽນສຳເລັດແລ້ວ',
             data: users
         })
