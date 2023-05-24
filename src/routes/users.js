@@ -11,5 +11,6 @@ router.post('/login', registercontroller.login)
 router.get('/:id',registercontroller.getUsers)
 router.get('/', registercontroller.getUsersAll)
 router.put('/forgotpassword',registercontroller.updateUsers)
+router.patch('/changepassword/:id', registercontroller.changepassword)
 
 module.exports = router;
