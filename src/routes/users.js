@@ -10,6 +10,6 @@ router.post('/register', registercontroller.register);
 router.post('/login', registercontroller.login)
 router.get('/:id',registercontroller.getUsers)
 router.get('/', registercontroller.getUsersAll)
-router.put('/:id',registercontroller.updateUsers)
+router.put('/forgotpassword',registercontroller.updateUsers)
 
 module.exports = router;

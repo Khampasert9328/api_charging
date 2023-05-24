@@ -1,6 +1,9 @@
 const usersmodel = require('../models/users/users_models');
 const jwt = require('jsonwebtoken');
 const config = require('../config/index')
+const nodemailer = require('nodemailer')
+const bcrypt = require('bcryptjs');
+const users = require('../models/users/users_models');
 
 exports.register = async (req, res, next) => {
     try {
@@ -19,7 +22,7 @@ exports.register = async (req, res, next) => {
             users.password = await users.encryptPassword(password)
         await users.save()
         res.status(201).json({
-            status_code:201,
+            status_code: 201,
             message: 'ລົງທະບຽນສຳເລັດແລ້ວ',
             data: users
         })
@@ -117,30 +120,56 @@ exports.getUsersAll = async (req, res, next) => {
 }
 
 exports.updateUsers = async (req, res) => {
+
+    const { email } = req.body;
+
+
     try {
-        const { id } = req.params
-        const { name, email, password } = req.body;
-        const data = await usersmodel.findByIdAndUpdate({_id:id},{
-            name:name,
-            email:email,
-            password:password
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: "xaiy95494979@gmail.com",
+                pass: "dwpqdgbpdxzjzqyt"
+            }
         })
 
-        if (!data) {
-            res.status(400).json({
-                message:"ບໍ່ສາມາດອັບເດດຂໍ້ມູນໄດ້"
-            })
+        transporter.verify((error, success) => {
+            if (error) {
+                console.log(error)
+
+            } else {
+                console.log("ready for message")
+                console.log(success)
+            }
+        })
+
+
+        const otp = `${Math.floor(10000000 + Math.random() * 90000000)}`;
+        const mailOption = {
+            from: email,
+            to: email,
+            subject: "ລະຫັດ OTP",
+            html: `<p>ລະຫັດຜ່ານຂອງທ່ານແມ່ນ: <b>${otp}</b></p>`
         }
+
+        console.log("mailOption", mailOption)
+
+        const salt = 10;
+        const hasOTP = await bcrypt.hash(otp, salt);
+        const newuser = await users.findOneAndUpdate({ email: email }, { password: hasOTP })
+        console.log("user", newuser)
+
+        await transporter.sendMail(mailOption)
+
         res.status(200).json({
-            message:"ອັບເດດຂໍ້ມູນສຳເລັດແລ້ວ"
+            message: "ກາລຸນາກວດສອບອີເມລຂອງທ່ານ",
+            data: {
+                data: newuser
+            }
         })
-
-
-        
-
 
     } catch (error) {
-    console.log(error)
+        console.log(error)
 
     }
 }
