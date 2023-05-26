@@ -101,6 +101,23 @@ exports.login = async (req, res, next) => {
     }
 }
 
+exports.getProfile = async (req, res, next) => {
+    try {
+        const { id, name, email, role } = req.user
+        return res.status(200).json({
+            dat: {
+                id: id,
+                name: name,
+                email: email,
+                role: role
+            }
+        })
+
+    } catch (error) {
+
+    }
+}
+
 
 exports.getUsers = async (req, res, next) => {
     try {
@@ -131,6 +148,7 @@ exports.getUsersAll = async (req, res, next) => {
                 message: "ບໍ່ມີຂໍ້ມູນໃນລະບົບ!!!!",
             })
         }
+
         res.status(200).json({
             status_code: 200,
             data: datauser,
