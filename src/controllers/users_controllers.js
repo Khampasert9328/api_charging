@@ -4,6 +4,7 @@ const config = require('../config/index')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcryptjs');
 const users = require('../models/users/users_models');
+const { options } = require('nodemon/lib/config');
 
 
 
@@ -85,7 +86,7 @@ exports.login = async (req, res, next) => {
         const token = await jwt.sign({
             id: checkemail._id,
             role: checkemail.role
-        }, config.JWT_SECRET, { expiresIn: "1 day" })
+        }, process.env.JWT_SECRET, { expiresIn: "1 day" })
 
         const tokenexpires = jwt.decode(token)
         res.status(200).json({
@@ -196,7 +197,6 @@ exports.updateUsers = async (req, res, next) => {
 
 exports.changepassword = async (req, res, next) => {
     try {
-
         const { id } = req.params;
         const { password } = req.body;
         const salt = await bcrypt.genSalt(5)
