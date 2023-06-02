@@ -166,7 +166,7 @@ exports.updateUsers = async (req, res, next) => {
 
 
     try {
-        const otp = `${Math.floor(10000000 + Math.random() * 90000000)}`;
+        const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
         const mailOption = {
             from: email,
             to: email,
