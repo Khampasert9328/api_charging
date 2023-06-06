@@ -14,7 +14,7 @@ router.post('/login', registercontroller.login)
 router.get('/:id',registercontroller.getUsers)
 router.get('/', registercontroller.getUsersAll)
 router.put('/forgotpassword',registercontroller.updateUsers)
-router.patch('/changepassword/:id',[passportJWT.isLogin], registercontroller.changepassword)
+router.patch('/changepassword/:id',registercontroller.changepassword)
 router.get('/profile',[passportJWT.isLogin], registercontroller.getProfile)
 
 module.exports = router;
