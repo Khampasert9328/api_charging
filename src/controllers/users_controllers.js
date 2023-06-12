@@ -1,222 +1,212 @@
-const usersmodel = require('../models/users/users_models');
-const jwt = require('jsonwebtoken');
-const config = require('../config/index')
-const nodemailer = require('nodemailer')
-const bcrypt = require('bcryptjs');
-const users = require('../models/users/users_models');
-const { options } = require('nodemon/lib/config');
-
-
-
+const usersmodel = require("../models/users/users_models");
+const jwt = require("jsonwebtoken");
+const config = require("../config/index");
+const nodemailer = require("nodemailer");
+const bcrypt = require("bcryptjs");
+const users = require("../models/users/users_models");
+const { options } = require("nodemon/lib/config");
 
 //ສົ່ງອີເມລ
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: "xaiy95494979@gmail.com",
-        pass: "dwpqdgbpdxzjzqyt"
-    }
-})
+  service: "gmail",
+  auth: {
+    user: "xaiy95494979@gmail.com",
+    pass: "dwpqdgbpdxzjzqyt",
+  },
+});
 
 transporter.verify((error, success) => {
-    if (error) {
-        console.log(error)
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(success);
 
-    } else {
-        console.log("ready for message")
-        console.log(success)
-    }
-})
+    
+  }
+});
 
 exports.register = async (req, res, next) => {
-    try {
-        const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-        const checkemail = await usersmodel.findOne({ email: email })
-        if (checkemail) {
-            res.status(400).json({
-                message: 'ອີເມລນີ້ມີໃນລະບົບແລ້ວ',
-                data: email
-            })
-        }
-        let users = usersmodel();
-        users.name = name,
-            users.email = email,
-            users.password = await users.encryptPassword(password)
-        await users.save()
-        res.status(201).json({
-            status_code: 201,
-            message: 'ລົງທະບຽນສຳເລັດແລ້ວ',
-            data: users
-        })
-    } catch (error) {
-
-        next(error)
-
+    const checkemail = await usersmodel.findOne({ email: email });
+    if (checkemail) {
+      res.status(400).json({
+        status_code:400,
+        message: "ອີເມລນີ້ມີໃນລະບົບແລ້ວ",
+        data: email,
+      });
     }
-
-}
-
+    let users = usersmodel();
+    (users.name = name),
+      (users.email = email),
+      (users.password = await users.encryptPassword(password));
+    await users.save();
+    res.status(201).json({
+      status_code: 201,
+      message: "ລົງທະບຽນສຳເລັດແລ້ວ",
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.login = async (req, res, next) => {
-    try {
-
-        const { email, password } = req.body;
-        //check email in systems 
-        const checkemail = await usersmodel.findOne({ email: email })
-        if (!checkemail) {
-
-            res.status(400).json({
-                message: 'ອີເມລບໍ່ຖືກຕ້ອງ',
-                data: email
-            })
-        }
-
-
-        //ເຊັກລະຫັດຜ່ານ ກັບ ລະຫັດທີ່ຢູເຊີໃສ່ມາຕົງກັນຫຼືບໍ່
-        const checkPasswordlogin = await checkemail.checkPassword(password)
-        if (!checkPasswordlogin) {
-            res.status(400).json({
-                message: 'ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ',
-                data: password
-            })
-
-        }
-
-        const token = await jwt.sign({
-            id: checkemail._id,
-            role: checkemail.role
-        }, process.env.JWT_SECRET, { expiresIn: "1 day" })
-
-        const tokenexpires = jwt.decode(token)
-        res.status(200).json({
-            status_code: 200,
-            message: "ລັອກອິນສຳເລັດແລ້ວ",
-            access_token: token,
-            expires_token: tokenexpires
-        })
-
-    } catch (error) {
-        next(error)
-
+  try {
+    const { email, password } = req.body;
+    //check email in systems
+    const checkemail = await usersmodel.findOne({ email: email });
+    if (!checkemail) {
+      res.status(400).json({
+        satatus_cod:400,
+        message: "ອີເມລບໍ່ຖືກຕ້ອງ",
+        data: email,
+      });
     }
-}
+
+    //ເຊັກລະຫັດຜ່ານ ກັບ ລະຫັດທີ່ຢູເຊີໃສ່ມາຕົງກັນຫຼືບໍ່
+    const checkPasswordlogin = await checkemail.checkPassword(password);
+    if (!checkPasswordlogin) {
+      res.status(400).json({
+        satatus_cod:400,
+        message: "ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ",
+        data: password,
+      });
+    }
+
+    const token = await jwt.sign(
+      {
+        id: checkemail._id,
+        role: checkemail.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1 day" }
+    );
+
+    const tokenexpires = jwt.decode(token);
+    res.status(200).json({
+      status_code: 200,
+      message: "ລັອກອິນສຳເລັດແລ້ວ",
+      access_token: token,
+      expires_token: tokenexpires,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.getProfile = async (req, res, next) => {
-    try {
-        const { id, name, email, role } = req.user
-        return res.status(200).json({
-            dat: {
-                id: id,
-                name: name,
-                email: email,
-                role: role
-            }
-        })
-
-    } catch (error) {
-
-    }
-}
-
+  try {
+    const { id, name, email, role } = req.user;
+    return res.status(200).json({
+      dat: {
+        id: id,
+        name: name,
+        email: email,
+        role: role,
+      },
+    });
+  } catch (error) {}
+};
 
 exports.getUsers = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const users = await usersmodel.findById({ _id: id })
-        if (!users) {
-            res.status(400).json({
-                status_code: 400,
-                message: "ບໍ່ມີຢູເຊີນີ້ໃນລະບົບ",
-            })
-        }
-        res.status(200).json({
-            status_code: 200,
-            data: users,
-        })
-    } catch (error) {
-        next()
-
+  try {
+    const { id } = req.params;
+    const users = await usersmodel.findById({ _id: id });
+    if (!users) {
+      res.status(400).json({
+        status_code: 400,
+        message: "ບໍ່ມີຢູເຊີນີ້ໃນລະບົບ",
+      });
     }
-}
+    res.status(200).json({
+      status_code: 200,
+      data: users,
+    });
+  } catch (error) {
+    next();
+  }
+};
 
 exports.getUsersAll = async (req, res, next) => {
-    try {
-        const datauser = await usersmodel.find()
-        if (!datauser) {
-            res.status(400).json({
-                status_code: 400,
-                message: "ບໍ່ມີຂໍ້ມູນໃນລະບົບ!!!!",
-            })
-        }
-
-        res.status(200).json({
-            status_code: 200,
-            data: datauser,
-        })
-    } catch (error) {
-        next()
-
+  try {
+    const datauser = await usersmodel.find();
+    if (!datauser) {
+      res.status(400).json({
+        status_code: 400,
+        message: "ບໍ່ມີຂໍ້ມູນໃນລະບົບ!!!!",
+      });
     }
-}
+
+    res.status(200).json({
+      status_code: 200,
+      data: datauser,
+    });
+  } catch (error) {
+    next();
+  }
+};
 
 exports.updateUsers = async (req, res, next) => {
-
-    const { email } = req.body;
-
-
-    try {
-        const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
-        const mailOption = {
-            from: email,
-            to: email,
-            subject: "ລະຫັດ OTP",
-            html: `<p>ລະຫັດຜ່ານຂອງທ່ານແມ່ນ: <b>${otp}</b></p>`
-        }
-        const salt = 10;
-        const hasOTP = await bcrypt.hash(otp, salt);
-        const newuser = await users.findOneAndUpdate({ email: email }, { password: hasOTP })
-        if (!newuser) {
-            res.status(400).json({
-                status_code: 400,
-                message: "ບໍ່ມີອີເມລໃນລະບົບ!!!!",
-
-            })
-        }
-        await transporter.sendMail(mailOption)
-        res.status(200).json({
-            message: "ກາລຸນາກວດສອບອີເມລຂອງທ່ານ",
-            data: newuser
-        })
-
-    } catch (error) {
-        console.log(error)
-
+  const { email } = req.body;
+  try {
+    const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+    const mailOption = {
+      from: email,
+      to: email,
+      subject: "ລະຫັດ OTP",
+      html: `<p>ລະຫັດຜ່ານຂອງທ່ານແມ່ນ: <b>${otp}</b></p>`,
+    };
+    const salt = 10;
+    const hasOTP = await bcrypt.hash(otp, salt);
+    const newuser = await users.findOneAndUpdate(
+      { email: email },
+      { password: hasOTP }
+    );
+    if (!newuser) {
+      res.status(400).json({
+        status_code: 400,
+        message: "ບໍ່ມີອີເມລໃນລະບົບ!!!!",
+      });
     }
-}
+    await transporter.sendMail(mailOption);
+    res.status(200).json({
+      satatus_cod:200,
+      message: "ກາລຸນາກວດສອບອີເມລຂອງທ່ານ",
+      data: newuser,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 exports.changepassword = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { password } = req.body;
-        const salt = await bcrypt.genSalt(5)
-        const haspassword = await bcrypt.hash(password, salt)
-        const dataupdate = await users.findOneAndUpdate({ _id: id }, {
-            password: haspassword
-        }, { new: true },);
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+    const salt = await bcrypt.genSalt(5);
+    const haspassword = await bcrypt.hash(password, salt);
+    const dataupdate = await users.findOneAndUpdate(
+      { _id: id },
+      {
+        password: haspassword,
+      },
+      { new: true }
+    );
 
-        if (!dataupdate) {
-            res.status(400).json({
-                message: "ບໍ່ສາມາດປ່ຽນລະຫັດຜ່ານໄດ້"
-            })
-        }
-        res.status(200).json({
-            message: "ປ່ຽນລະຫັດຜ່ານສຳເລັດແລ້ວ",
-            data: dataupdate
-        })
-
-    } catch (error) {
-        console.log(error)
-
+    if (!dataupdate) {
+      res.status(400).json({
+      satatus_cod:400,
+        message: "ບໍ່ສາມາດປ່ຽນລະຫັດຜ່ານໄດ້",
+      });
     }
-}
+    res.status(200).json({
+      satatus_cod:200,
+      message: "ປ່ຽນລະຫັດຜ່ານສຳເລັດແລ້ວ",
+      data: dataupdate,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
