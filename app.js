@@ -12,9 +12,12 @@ const rateLimit = require('express-rate-limit')
 //connectDatabase
 const connectDB = require('./src/config/connectDB')
 
+
+//route
 const indexRouter = require('./src/routes/index');
 const usersRouter = require('./src/routes/users');
 const addinfocharging = require('./src/routes/addinfocharging/add_info_route')
+const upload = require('./src/routes/uploadimage/uploadimage')
 
 var app = express();
 
@@ -42,5 +45,6 @@ app.use(passport.initialize())
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/chargin',addinfocharging)
+app.use('/uploadimages',upload)
 
 module.exports = app;
