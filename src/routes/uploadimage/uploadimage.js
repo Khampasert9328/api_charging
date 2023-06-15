@@ -11,8 +11,8 @@ const upload = require("../../controllers/uploadimage");
 router.post(
   "/uploadimage",
   passportJWT.isLogin,
-  uploadimages.array("file",2),
-  upload.UploadsImageMany
+  uploadimages.single("image"),
+  upload.UploadImageOne
 );
 
 module.exports = router;

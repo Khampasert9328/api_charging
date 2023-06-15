@@ -9,54 +9,42 @@ const s3 = new aws.S3({
   endpoint: spacesEndpoint,
 });
 
-exports.UploadsImageMany = async (req, res, next) => {
-   try {
-    const files = req.files;
-    if (!files) return res.json({ message: "Don't Have Any File" });
-  
-    const ArrUrlImage = [];
-  
-    for (let i = 0; i < files.length; i++) {
-      const fileType = path.extname(files[i].originalname).toLowerCase();
-      if (
-        fileType == '.png' ||
-        fileType == '.jpg' ||
-        fileType == '.jpeg' ||
-        fileType == '.pdf'
-      ) {
-        // create file name
-        const randomChar = Math.random().toString(36).substring(7);
-        const time = new Date().getTime();
-        const fileName = `${randomChar}${time}` + `${fileType}`;
-  
-        await s3
-          .putObject({
-            ACL: 'public-read',
-            Bucket: BUCKET_NAME + '/saveimagecharg',
-            Key: fileName,
-            Body: files[i].buffer,
-            ContentType: files[i].mimetype,
-          })
-          .promise();
-  
-        const urlImage = `https://ad-bucket.sgp1.digitaloceanspaces.com/saveimagecharg/${fileName}`;
-  
-        const data = {
-          urlImage: urlImage,
-          imageKey: fileName,
-        };
-  
-        ArrUrlImage.push(data);
-      } else {
-        res.send({ message: 'Allow Only PNG, JPG, JPEG, PDF' });
-      }
-    }
-  
-    res.send({
-      urlImage: ArrUrlImage,
-      message: 'Upload Images Successfully',
+exports.UploadImageOne = async (req, res, next) => {
+  const file = req.file;
+  console.log("File = ", file)
+  if (!file) return res.json({ msg: 'no file' });
+  const fileType = path.extname(file.originalname).toLowerCase();
+  console.log("fileType = ", fileType)
+
+  if (
+    fileType == '.png' ||
+    fileType == '.jpg' ||
+    fileType == '.jpeg' ||
+    fileType == '.pdf'
+  ) {
+    // create file name
+    const randomChar = Math.random().toString(36).substring(7);
+    const time = new Date().getTime();
+    const fileName = `${randomChar}${time}` + `${fileType}`;
+
+    await s3
+      .putObject({
+        ACL: 'public-read',
+        Bucket: BUCKET_NAME + '/saveimagecharg',
+        Key: fileName,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      })
+      .promise();
+
+    const urlImage = `https://ad-bucket.sgp1.digitaloceanspaces.com/saveimagecharg/${fileName}`;
+      console.log("Success Upload")
+    res.status(200).json({
+      urlImage: urlImage,
+      imageKey: fileName,
+      message: 'Upload Image Successfully',
     });
-   } catch (error) {
-    console.log(error);
-   }
-  };
+  } else {
+    return res.status(500).json({ msg: 'Allow Only PNG, JPG, JPEG, PDF' });
+  }
+};
