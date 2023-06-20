@@ -6,16 +6,13 @@ const AddinfomodelsSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
     },
     imagecpn: {
       type: String,
-      required: true,
     },
 
     amount: {
       type: Number,
-      required: true,
     },
     constainner: [
       {
