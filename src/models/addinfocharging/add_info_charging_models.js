@@ -6,6 +6,7 @@ const AddinfomodelsSchema = new Schema(
   {
     name: {
       type: String,
+      require: true,
     },
     imagecpn: {
       type: String,
