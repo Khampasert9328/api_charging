@@ -21,25 +21,20 @@ const AddinfomodelsSchema = new Schema(
       {
         count: {
           type: String,
-          required: true,
         },
         brand: {
           type: String,
-          required: true,
         },
         generation: {
           type: String,
-          required: true,
         },
         model: {
           type: String,
-          required: true,
         },
         type_charge: [
           {
             type_charging: {
               type: String,
-              required: true,
             },
           },
         ],
@@ -48,29 +43,23 @@ const AddinfomodelsSchema = new Schema(
 
     pictureplace: {
       type: String,
-      required: true,
     },
     province: {
       type: String,
-      required: true,
     },
     district: {
       type: String,
-      required: true,
     },
     village: {
       type: String,
-      required: true,
     },
     nameplace: {
       type: String,
-      required: true,
     },
     facilities: [
       {
         facilitie: {
           type: String,
-          required: true,
         },
       },
     ],
