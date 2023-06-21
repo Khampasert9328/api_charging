@@ -89,7 +89,7 @@ exports.getInfochargAll = async (req, res) => {
       });
     }
     res.status(200).json({
-      data: data,
+      data: data.reverse(),
     });
   } catch (error) {}
 };
