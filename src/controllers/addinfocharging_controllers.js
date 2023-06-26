@@ -93,6 +93,24 @@ exports.getInfochargAll = async (req, res) => {
     });
   } catch (error) {}
 };
+exports.getDatabyId=async(req, res)=>{
+  try {
+    const{id} = req.params;
+    const data = await Addinfomodels.findById({_id:id});
+    if (!data) {
+      res.status(400).json({
+        message:"ບໍ່ມີຂໍ້ມູນນີ້ໃນລະບົບ"
+      })
+    }
+    res.status(200).json({
+      data: data
+    })
+    
+  } catch (error) {
+    console.log(error)
+    
+  }
+}
 exports.deletebyid = async (req, res, next) => {
   try {
     const { id } = req.params;

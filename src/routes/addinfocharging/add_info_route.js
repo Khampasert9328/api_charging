@@ -18,6 +18,7 @@ router.get(
   "/getinfochargall",
   insetinfocharging.getInfochargAll
 );
+router.get("/getchargbyid/:id", insetinfocharging.getDatabyId)
 router.delete(
   "/deleteinfochargall/:id",
   [passportJWT.isLogin],
