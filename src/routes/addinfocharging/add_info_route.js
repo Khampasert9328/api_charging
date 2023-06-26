@@ -16,7 +16,6 @@ router.post(
 );
 router.get(
   "/getinfochargall",
-  [passportJWT.isLogin],
   insetinfocharging.getInfochargAll
 );
 router.delete(
