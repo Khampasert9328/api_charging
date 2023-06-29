@@ -151,7 +151,6 @@ exports.updateInfochargbyid = async (req, res, next) => {
       lat_location,
       lng_lacation,
     } = req.body;
-    console.log("body:", req.body);
     const { id } = req.params;
     const updatedata = await Addinfomodels.findById(id);
     if (!updatedata) {
