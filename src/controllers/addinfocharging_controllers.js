@@ -152,6 +152,7 @@ exports.updateInfochargbyid = async (req, res, next) => {
       lng_lacation,
     } = req.body;
     const { id } = req.params;
+    const idobject = Object.keys(req.body)
     const updatedata = await Addinfomodels.findById(id);
     if (!updatedata) {
       return res.status(404).json({ message: "ບໍ່ມີໄອດີນີ້ໃນລະບົບ" });
@@ -169,13 +170,15 @@ exports.updateInfochargbyid = async (req, res, next) => {
           nameplace: nameplace,
           lat_location: lat_location,
           lng_lacation: lng_lacation,
-        }
+        },{new: true}
       );
       let containerArray = [];
       let facilitiesArray = [];
+      
       if (constainner) {
         for (let index = 0; index < constainner.length; index++) {
           containerArray.push({
+            count: `ຕູ້ທີ${index + 1}`,
             brand: constainner[index].brand,
             generation: constainner[index].generation,
             model: constainner[index].model,
@@ -197,6 +200,7 @@ exports.updateInfochargbyid = async (req, res, next) => {
       if (!data) {
         res.status(404).json({ message: "ບໍ່ສາມາດແກ້ໄຂໄດ້ ລອງໃໝ່ອີກຄັ້ງ" });
       }
+      await data.save()
       res.status(200).json({
         message: "ອັບເດດຂໍ້ມູນສຳເລັດ",
         data: data,
