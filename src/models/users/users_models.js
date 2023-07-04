@@ -13,7 +13,7 @@ const usersmodel = new schemaUsers(
       index: true
     },
     password: { type: String, require: true, trim: true, minlength: 3 },
-    role: { type: String, default: "member" },
+    role: { type: String, default: "general" },
   },
   {
     collection: "users",
